@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 #
+# by: Israel Comazzetto dos Reis
 # MASS Brute for EMAIL Checking
 
 import requests
