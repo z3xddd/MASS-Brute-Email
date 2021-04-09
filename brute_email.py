@@ -6,6 +6,8 @@ from requests import get
 from time import sleep
 from threading import Thread
 
+import threading
+
 # threads_to_create = 100
 threads = []
 emails_leaked = []
@@ -18,7 +20,7 @@ email_wlist = open('/home/israel-kali/wordlist/wordlist_email', 'r').readlines()
 domain_wlist = open('/home/israel-kali/wordlist/domains', 'r').readlines()
 sleep(3)
 
-def mass_brute(email, domain):
+def mass_brute(email, domain, lock):
     emails_leaked = []
     qnt_emails_leaked = 0
     payloads = (f'{email}{domain}')
@@ -33,10 +35,11 @@ def mass_brute(email, domain):
         print(emails_leaked)
     sleep(3)
 
+lock = threading.Lock()    
 for domain in domain_wlist:
     for email in email_wlist:
         #make_request(email, domain)
-        th = Thread(target=mass_brute, args=(email, domain))
+        th = Thread(target=mass_brute, args=(email, domain, lock))
         th.start()
         threads.append(th)
 
