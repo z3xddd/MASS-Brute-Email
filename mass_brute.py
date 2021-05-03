@@ -5,7 +5,10 @@
 
 import requests
 from time import sleep
-from vars_mass_brute import massBrutevr
+
+class massBrutevr(object):
+    wordlist_email = "wl_email"
+    wordlist_domain = "wl_domain
 
 class massBrute(object):
 
@@ -53,7 +56,3 @@ if opcao_usuario == 's':
     user_options.IniciaMassBrute()
 else:
     exit()
-    
-class massBrutevr(object):
-    wordlist_email = "wl_email"
-    wordlist_domain = "wl_domain
