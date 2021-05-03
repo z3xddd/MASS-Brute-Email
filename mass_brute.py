@@ -53,3 +53,7 @@ if opcao_usuario == 's':
     user_options.IniciaMassBrute()
 else:
     exit()
+    
+class massBrutevr(object):
+    wordlist_email = "wl_email"
+    wordlist_domain = "wl_domain
